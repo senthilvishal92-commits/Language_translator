@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Language Translation Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *{
+        box-sizing:border-box;
+        margin:0;
+        padding:0;
+    }
+
+    body{
+        font-family:'Inter','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+        background:linear-gradient(
+            135deg,
+            #ff6b6b 0%,
+            #ff9f43 20%,
+            #feca57 40%,
+            #48dbfb 60%,
+            #5f27cd 80%,
+            #341f97 100%
+        );
+        min-height:100vh;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        padding:24px;
+        position:relative;
+        overflow:hidden;
+    }
+
+    body::before{
+        content:'';
+        position:fixed;
+        inset:0;
+        background:
+            radial-gradient(circle at 20% 20%,rgba(255,255,255,.15),transparent 40%),
+            radial-gradient(circle at 80% 80%,rgba(255,255,255,.12),transparent 40%);
+        pointer-events:none;
+    }
+
+    .card{
+        background:#ffffff;
+        border-radius:24px;
+        box-shadow:
+            0 10px 30px rgba(0,0,0,.08),
+            0 25px 70px rgba(0,0,0,.18);
+        padding:44px 48px;
+        width:100%;
+        max-width:620px;
+        position:relative;
+        z-index:1;
+    }
+
+    .card-header{
+        text-align:center;
+        margin-bottom:36px;
+    }
+
+    .card-icon{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        width:60px;
+        height:60px;
+        border-radius:16px;
+        background:linear-gradient(
+            135deg,
+            #ff512f,
+            #dd2476
+        );
+        font-size:1.6rem;
+        margin-bottom:16px;
+        box-shadow:0 6px 20px rgba(221,36,118,.35);
+    }
+
+    h1{
+        font-size:2rem;
+        font-weight:800;
+        background:linear-gradient(
+            135deg,
+            #ff512f,
+            #dd2476,
+            #6a11cb
+        );
+        -webkit-background-clip:text;
+        -webkit-text-fill-color:transparent;
+        background-clip:text;
+        margin-bottom:8px;
+    }
+
+    .subtitle{
+        color:#6b7280;
+        font-size:.95rem;
+        line-height:1.5;
+    }
+
+    .section-label{
+        display:block;
+        font-size:.75rem;
+        font-weight:700;
+        color:#dd2476;
+        margin-bottom:8px;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+    }
+
+    textarea{
+        width:100%;
+        padding:16px 18px;
+        border:2px solid #e5e7eb;
+        border-radius:14px;
+        font-size:1rem;
+        font-family:inherit;
+        resize:vertical;
+        min-height:130px;
+        background:#fafafa;
+        color:#111827;
+        outline:none;
+        transition:.25s;
+        line-height:1.6;
+    }
+
+    textarea::placeholder{
+        color:#9ca3af;
+    }
+
+    textarea:focus{
+        border-color:#dd2476;
+        background:#fff;
+        box-shadow:0 0 0 4px rgba(221,36,118,.12);
+    }
+
+    .lang-row{
+        display:flex;
+        gap:14px;
+        margin-top:22px;
+        align-items:flex-end;
+    }
+
+    .lang-group{
+        flex:1;
+    }
+
+    select{
+        width:100%;
+        padding:13px 16px;
+        border:2px solid #e5e7eb;
+        border-radius:12px;
+        font-size:.95rem;
+        font-family:inherit;
+        font-weight:500;
+        color:#111827;
+        background:#fafafa;
+        cursor:pointer;
+        appearance:none;
+        outline:none;
+        transition:.25s;
+        background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23dd2476' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+        background-repeat:no-repeat;
+        background-position:right 14px center;
+        padding-right:38px;
+    }
+
+    select:focus{
+        border-color:#dd2476;
+        background:#fff;
+        box-shadow:0 0 0 4px rgba(221,36,118,.12);
+    }
+
+    .swap-btn{
+        background:linear-gradient(
+            135deg,
+            #ff9f43,
+            #ee5253
+        );
+        border:none;
+        border-radius:50%;
+        width:46px;
+        height:46px;
+        cursor:pointer;
+        font-size:1.2rem;
+        color:white;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        transition:.3s;
+        flex-shrink:0;
+    }
+
+    .swap-btn:hover{
+        transform:rotate(180deg) scale(1.05);
+        box-shadow:0 6px 18px rgba(238,82,83,.35);
+    }
+
+    .translate-btn{
+        width:100%;
+        margin-top:26px;
+        padding:16px;
+        background:linear-gradient(
+            135deg,
+            #ff512f,
+            #dd2476,
+            #6a11cb,
+            #2575fc
+        );
+        background-size:250% auto;
+        color:#fff;
+        border:none;
+        border-radius:14px;
+        font-size:1.05rem;
+        font-weight:700;
+        cursor:pointer;
+        transition:.35s;
+        box-shadow:0 6px 20px rgba(221,36,118,.35);
+    }
+
+    .translate-btn:hover:not(:disabled){
+        background-position:right center;
+        transform:translateY(-2px);
+        box-shadow:0 10px 28px rgba(221,36,118,.45);
+    }
+
+    .translate-btn:disabled{
+        opacity:.7;
+        cursor:not-allowed;
+    }
+
+    .result-box{
+        margin-top:30px;
+        display:none;
+    }
+
+    .result-header{
+        display:flex;
+        align-items:center;
+        gap:8px;
+        margin-bottom:12px;
+    }
+
+    .result-dot{
+        width:8px;
+        height:8px;
+        border-radius:50%;
+        background:#dd2476;
+    }
+
+    .result-label{
+        font-size:.75rem;
+        font-weight:700;
+        color:#dd2476;
+        text-transform:uppercase;
+        letter-spacing:.08em;
+    }
+
+    .result-text{
+        background:linear-gradient(
+            135deg,
+            #fff5f5,
+            #fff9db
+        );
+        border:2px solid #f9ca24;
+        border-radius:14px;
+        padding:20px 22px;
+        font-size:1.05rem;
+        font-weight:500;
+        color:#111827;
+        line-height:1.7;
+    }
+
+    .error-text{
+        background:#fef2f2;
+        border:2px solid #fecaca;
+        border-radius:14px;
+        padding:16px 20px;
+        color:#dc2626;
+        font-weight:500;
+    }
+
+    .spinner{
+        display:inline-block;
+        width:15px;
+        height:15px;
+        border:2.5px solid rgba(255,255,255,.35);
+        border-top-color:#fff;
+        border-radius:50%;
+        animation:spin .7s linear infinite;
+        margin-right:8px;
+    }
+
+    @keyframes spin{
+        to{
+            transform:rotate(360deg);
+        }
+    }
+
+    .copy-btn{
+        margin-top:12px;
+        padding:8px 18px;
+        border:none;
+        border-radius:8px;
+        background:linear-gradient(
+            135deg,
+            #ff9f43,
+            #ee5253
+        );
+        color:#fff;
+        font-size:.85rem;
+        font-weight:600;
+        cursor:pointer;
+        transition:.25s;
+    }
+
+    .copy-btn:hover{
+        transform:translateY(-1px);
+        box-shadow:0 5px 14px rgba(238,82,83,.35);
+    }
+</style>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <div class="card-icon">🌐</div>
+            <h1>Language Translator</h1>
+            <p class="subtitle">Translate instantly between English, Tamil, Hindi &amp; French</p>
+        </div>
+
+        <label class="section-label" for="input-text">Text to Translate</label>
+        <textarea
+            id="input-text"
+            placeholder="Enter text here..."
+            rows="5"
+        ></textarea>
+
+        <div class="lang-row">
+            <div class="lang-group">
+                <label class="section-label" for="src-lang">From</label>
+                <select id="src-lang">
+                    {% for code, name in languages.items() %}
+                    <option value="{{ code }}" {% if code == 'en' %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button class="swap-btn" id="swap-btn" title="Swap languages">&#8644;</button>
+
+            <div class="lang-group">
+                <label class="section-label" for="dest-lang">To</label>
+                <select id="dest-lang">
+                    {% for code, name in languages.items() %}
+                    <option value="{{ code }}" {% if code == 'fr' %}selected{% endif %}>{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <button class="translate-btn" id="translate-btn" onclick="translateText()">
+            Translate
+        </button>
+
+        <div class="result-box" id="result-box">
+            <div class="result-header">
+                <div class="result-dot"></div>
+                <div class="result-label">Translation</div>
+            </div>
+            <div id="result-content"></div>
+            <button class="copy-btn" id="copy-btn" onclick="copyResult()" style="display:none;">Copy</button>
+        </div>
+    </div>
+
+    <script>
+        async function translateText() {
+            const text = document.getElementById("input-text").value.trim();
+            const srcLang = document.getElementById("src-lang").value;
+            const destLang = document.getElementById("dest-lang").value;
+            const btn = document.getElementById("translate-btn");
+            const resultBox = document.getElementById("result-box");
+            const resultContent = document.getElementById("result-content");
+            const copyBtn = document.getElementById("copy-btn");
+
+            if (!text) {
+                showError("Please enter some text to translate.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>Translating...';
+            resultBox.style.display = "none";
+            copyBtn.style.display = "none";
+
+            try {
+                const response = await fetch("/translate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text, src_lang: srcLang, dest_lang: destLang }),
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || data.error) {
+                    showError(data.error || "An unexpected error occurred.");
+                } else {
+                    resultContent.className = "result-text";
+                    resultContent.textContent = data.translated_text;
+                    resultBox.style.display = "block";
+                    copyBtn.style.display = "inline-block";
+                    copyBtn.textContent = "Copy";
+                }
+            } catch (err) {
+                showError("Network error: Could not connect to the translation service.");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = "Translate";
+            }
+        }
+
+        function showError(message) {
+            const resultBox = document.getElementById("result-box");
+            const resultContent = document.getElementById("result-content");
+            const copyBtn = document.getElementById("copy-btn");
+
+            resultContent.className = "error-text";
+            resultContent.textContent = message;
+            resultBox.style.display = "block";
+            copyBtn.style.display = "none";
+        }
+
+        function copyResult() {
+            const text = document.getElementById("result-content").textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById("copy-btn");
+                btn.textContent = "Copied!";
+                setTimeout(() => { btn.textContent = "Copy"; }, 2000);
+            });
+        }
+
+        document.getElementById("swap-btn").addEventListener("click", function () {
+            const src = document.getElementById("src-lang");
+            const dest = document.getElementById("dest-lang");
+            const tmp = src.value;
+            src.value = dest.value;
+            dest.value = tmp;
+        });
+
+        document.getElementById("input-text").addEventListener("keydown", function (e) {
+            if (e.ctrlKey && e.key === "Enter") {
+                translateText();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
